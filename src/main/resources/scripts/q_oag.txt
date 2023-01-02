@@ -1,0 +1,115 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+# init;
+# prepare from "data";
+connect lb;
+drop TEST1;
+create graph TEST1;
+use TEST1;
+
+# schema;
+create node AA;
+create node AP;
+create node AV;
+create node MA;
+create node MP;
+create node MV;
+create node OA;
+create node OP;
+create node OV;
+create edge W (AP -> AA);
+create edge P (AP -> AV);
+create edge W (MP -> MA);
+create edge P (MP -> MV);
+create edge W (OP -> OA);
+create edge P (OP -> OV);
+
+create edge L (AA -> MA);
+create edge L (AP -> MP);
+create edge L (AV -> MV);
+create edge L (OA -> OA);
+create edge L (OP -> OP);
+create edge L (OV -> OV);
+
+# data
+insert N (1,"AA");
+insert N (2,"AP");
+insert N (3,"AV");
+insert N (4,"MA");
+insert N (5,"MP");
+insert N (6,"MV");
+insert E (101,2,1,"W");
+insert E (102,2,3,"P");
+insert E (103,5,4,"W");
+insert E (104,5,6,"P");
+insert E (105,4,1,"L");
+insert E (106,5,2,"L");
+insert E (107,6,3,"L");
+insert N (11,"AA");
+insert N (12,"AP");
+insert N (13,"AV");
+insert N (14,"MA");
+insert N (15,"MP");
+insert N (16,"MV");
+insert E (111,12,11,"W");
+insert E (112,12,13,"P");
+insert E (113,15,14,"W");
+insert E (114,15,16,"P");
+insert E (115,14,11,"L");
+insert E (116,15,12,"L");
+insert E (117,16,13,"L");
+
+insert NP (4, "name", "tom");
+insert NP (14, "name", "jane");
+insert NP (2, "title", "good_paper");
+insert NP (3, "cname", "vldb");
+insert EP (101, "date", "20100102");
+insert EP (115, "linked", "yes");
+
+# constraints (EGDs);
+#add constraint N(b,"B"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+#add constraint N(b,"B1"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C1"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+
+# import data from CSV;
+#import N from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/oag/node.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/oag/edge.csv";
+
+# views; 
+# virtual
+# hybrid
+# materialized
+# asr
+
+create materialized view v0 as {
+#	match n1:MA-e1:L->n2:AA where n1 >= 100, n1 <= 1000 map (n1,n2) to s:OA
+	match n1:MA-e1:L->n2:AA where n1.name = "jane" map (n1,n2) to s:OA
+#}, {
+#	match n1:MP-e1:L->n2:AP where n1 >= 200000024, n1 <= 200020024 map (n1,n2) to s:OP
+};
+
+#create ssr on v0;
+
+#program;
+
+match n1:OA from v0 return n1;
+match n1:OA from v0 where n1.name = "jane" return n1;
+
+#match n1:OA from v0 where n1 < 10 return n1;
+#match n1:OA from v0 where n1 < 500 return n1;
+#match n1:OA from v0 where n1 < 500 return n1;
+#match n1:OP from v0 where n1 < 0 return n1;
+#match n1:OP from v0 where n1 > 20019733 return n1;
+#match n1:OP from v0 where n1 > 20019733 return n1;
+#match n1:OP-e1:W->n3:OA from v0 return e1;
+
+#match n1:W-e3:NN->n3:L from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 100, n1 < 200 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:NEWNODE from v0 where n1 < 100 return n1;
+#match n1:NEWNODE from v0 where n1 > 1000, n1 < 1200 return n1;
+
+disconnect;

@@ -1,0 +1,11 @@
+// import from CSV
+
+_in(offset; id, type) -> int(offset), string(id), string(type).
+lang:physical:filePath[`_in] = "/Users/sbnet21/src/workspace/graph-trans/src/main/logicblox/node3.csv".
+lang:physical:fileMode[`_in] = "import".
++raw_node(id, type) <- _in(_; id, type).
+
+_in_e(offset; id1, id2, type) -> int(offset), string(id1), string(id2), string(type).
+lang:physical:filePath[`_in_e] = "/Users/sbnet21/src/workspace/graph-trans/src/main/logicblox/edge3.csv".
+lang:physical:fileMode[`_in_e] = "import".
++raw_edge(id1, id2, type) <- _in_e(_; id1, id2, type).

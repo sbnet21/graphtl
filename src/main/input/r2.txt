@@ -1,0 +1,12 @@
+[
+	{
+		(
+			match a:RESLICE-USED->b:WARP_PARAMS, b-WAS_GENERATED_BY->c:ALIGN_WARP 
+			map {a,b,c}|->u:UBIO_BOX_1
+		),
+		(
+			match a:CONVERT-USED->b:ALIAS_SLICE, b-WAS_GENERATED_BY->c:SLICER
+			map {a,b,c}|->u:UBIO_BOX_2
+		)
+	}
+]

@@ -1,0 +1,60 @@
+        -- below are common for rules
+        SELECT count(*) INTO cnt FROM map_temp;
+        RAISE NOTICE '[INFO] count(*) from map_temp: %', cnt;
+
+        IF cnt = 0 THEN
+            INSERT INTO e$vpf$ (_0, _1, _2, _3) VALUES (NEW._0, NEW._1, NEW._2, NEW._3);
+            RETURN NULL;
+        END IF;
+        
+        -- Populate N-,N'
+        INSERT INTO n_del$vpf$ SELECT DISTINCT _0, _1 FROM map_temp;
+        DELETE FROM n$vpf$ WHERE _0 IN (SELECT DISTINCT _0 FROM map_temp);
+
+        -- Populate N+,N'
+        INSERT INTO n_add$vpf$ SELECT DISTINCT _2, _3 FROM map_temp;            
+        INSERT INTO n$vpf$ SELECT DISTINCT _2, _3 FROM map_temp;            
+
+        -- Populate E-,E'
+        -- from node
+        FOR curs IN
+            SELECT e._0 AS _0, e._1 AS _1, e._2 AS _2, e._3 AS _3, m._2 AS _t
+            FROM e_g AS e, map_temp AS m
+            WHERE m._0 = e._1
+        LOOP
+            RAISE NOTICE 'TARGET _0: %, _1: %, _2: %, _3: %, _t: %', curs._0, curs._1, curs._2, curs._3, curs._t;
+            UPDATE e_add$vpf$ SET _1 = curs._t WHERE _0 = curs._0;
+            GET diagnostics cnt = row_count;
+            IF cnt > 0 THEN
+                UPDATE e$vpf$ SET _1 = curs._t WHERE _0 = curs._0;
+            ELSE
+                INSERT INTO e_del$vpf$ (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._2, curs._3); 
+                DELETE FROM e$vpf$ WHERE _0 = curs._0; 
+                INSERT INTO e_add$vpf$ (_0, _1, _2, _3) VALUES (curs._0, curs._t, curs._2, curs._3);
+                INSERT INTO e$vpf$ (_0, _1, _2, _3) VALUES (curs._0, curs._t, curs._2, curs._3);
+            END IF;
+            RAISE NOTICE 'e_add$vpf$ update_count: %', cnt;
+        END LOOP;
+        -- to node
+        FOR curs IN
+            SELECT e._0 AS _0, e._1 AS _1, e._2 AS _2, e._3 AS _3, m._2 AS _t
+            FROM e_g AS e, map_temp AS m
+            WHERE m._0 = e._2
+        LOOP
+            RAISE NOTICE 'TARGET _0: %, _1: %, _2: %, _3: %, _t: %', curs._0, curs._1, curs._2, curs._3, curs._t;
+            UPDATE e_add$vpf$ SET _2 = curs._t WHERE _0 = curs._0;
+            GET diagnostics cnt = row_count;
+            IF cnt > 0 THEN
+                UPDATE e$vpf$ SET _2 = curs._t WHERE _0 = curs._0;
+            ELSE
+                INSERT INTO e_del$vpf$ (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._2, curs._3); 
+                DELETE FROM e$vpf$ WHERE _0 = curs._0; 
+                INSERT INTO e_add$vpf$ (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._t, curs._3);
+                INSERT INTO e$vpf$ (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._t, curs._3);
+            END IF;
+            RAISE NOTICE 'e_add$vpf$ update_count: %', cnt;
+        END LOOP;
+
+        RETURN NULL; -- result is ignored since this is an AFTER trigger
+        
+        

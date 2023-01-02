@@ -1,0 +1,69 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+# init;
+# prepare from "data";
+connect pg ;
+
+drop TEST1;
+create graph TEST1;
+use TEST1;
+
+
+#disconnect;
+
+
+# schema;
+create node A;
+create node B;
+create node C;
+create node D;
+create node S;
+
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge X (S -> S);
+create edge X (A -> S);
+create edge XC (S -> D);
+
+insert N (1,"A");
+insert N (2,"B");
+insert N (3,"C");
+insert N (4,"D");
+insert E (101,1,2,"X");
+insert E (102,2,3,"X");
+insert E (103,3,4,"X");
+
+# constraints (EGDs);
+#add constraint N(b,"B"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+#add constraint N(b,"B1"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C1"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+
+# import data from CSV;
+#import N from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/prov/node.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/prov/edge.csv";
+
+# views; 
+# virtual
+# hybrid
+# materialized
+# asr
+
+create virtual view v0 as {
+	match a:A-x1:X->b:B, b-x2:X->c:C, c-x3:X->d:D map (b,c) to s:S 
+};
+
+create ssr on v0;
+
+match s:S from v0 
+return s;
+
+#match v1:R-e1:DERBY->v2:R from v0 
+#where v1 >10, v1 < 100 
+#return v1-e1->v2;
+
+program;
+disconnect;

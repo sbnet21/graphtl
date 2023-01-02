@@ -1,0 +1,67 @@
+// schema (fixed)
+ans_node(a,b) -> string(a), string(b).
+ans_edge(a,b,c) -> string(a), string(b), string(c).
+ans_reach(a) -> string(a).
+paths(a,b) -> string(a), string(b).
+
+paths(a,b) <- edge0(a,b,_).
+paths(a,b) <- paths(a,c), paths(c,b).
+
+// Query 1
+// for c:C
+// return []-[]*->c
+// ans_reach(c) 	<- paths(r,c), 	node0(c,"C").
+// ans_reach(r) 	<- paths(r,c), 	node0(c,"C").
+
+// Query 2
+// for c:C
+// return c-[]*->[]
+// ans_reach(c) 	<- paths(c,r), 	node0(c,"C").
+// ans_reach(r) 	<- paths(c,r), 	node0(c,"C").
+
+// Query 3
+// for c:C-[]*->d, h:h-[]*-d
+// return c-[]*->d, h-[]*->d
+// ans_reach(c) 	<- paths(c,d), 	paths(h,d), node0(c,"C"), node0(h, "H").
+// ans_reach(d) 	<- paths(c,d), 	paths(h,d), node0(c,"C"), node0(h, "H").
+// ans_reach(h) 	<- paths(c,d), 	paths(h,d), node0(c,"C"), node0(h, "H").
+// ans_reach(d) 	<- paths(c,d), 	paths(h,d), node0(c,"C"), node0(h, "H").
+
+// ans_reach(e)    <- paths(c,e), paths(e,d), paths(c,d), 	paths(h,d), node0(c,"C"), node0(h,"H").
+// ans_reach(e)    <- paths(h,e), paths(e,d), paths(c,d), 	paths(h,d), node0(c,"C"), node0(h,"H").
+
+// Query 4
+// for d:D-[]*->b:B
+// return d-[]*->b
+// ans_reach(d) 	<- paths(d,b), node0(d,"D"), node0(b, "B").
+// ans_reach(b) 	<- paths(d,b), node0(d,"D"), node0(b, "B").
+
+// ans_reach(e)    <- paths(d,e), paths(e,b), paths(d,b), node0(d,"D"), node0(b, "B").
+
+// Query 5
+// for d-DC->c, c->CB->b // //DC/CB
+// return b-[]->a
+ans_reach(b) 	<- edge0(b,a,_), edge0(d,c,"DC"), edge0(c,b,"CB").
+ans_reach(a) 	<- edge0(b,a,_), edge0(d,c,"DC"), edge0(c,b,"CB").
+
+// below (fixed for one []*)
+ans_node(i,t) <- ans_reach(i), node0(i,t).
+ans_edge(i1,i2,t) <- ans_reach(i1), ans_reach(i2), edge0(i1,i2,t).
+
+/*
+// all nodes
+for a
+return a
+
+// all edges
+for a-[]->b
+return a-[]->b
+
+// edges of specific type
+for a:A-X->b:B
+return a-X->b
+
+// reachable at two hops
+for a:A-[]->b, b:B-[]->c
+return a-[]->b, b-[]->c
+*/

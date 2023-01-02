@@ -1,0 +1,258 @@
+{
+    "configFilePath": "graphview.conf",
+    "useRealExecution": true,
+    "printRules": true,
+    "printTiming": false,
+    "printConsole": true,
+
+    "queryIteration": 3,
+    "_queryIteration": 5,
+    "expIteration": 1,
+    "_expIteration": 5,
+    "ivm_iteration": 50,
+    "_ivm_iteration": 500,
+
+    "doTypeCheck": false,
+    "doVaryingScale": false,
+    "doVaryingSelectivity": false,
+    "doVariousDataset": true,
+    "doIVM": false, 
+    "doParallel": false,
+
+    "prune_typecheck": true,
+    "prune_subquery": false,
+
+    "exp_indexes": [false],
+    "_exp_indexes": [false, true],
+    "exp_useQueries": [true],
+    "_exp_useQueries": [false, true],
+    "exp_viewtypes": ["MV","HV","VV","ASR","SSR"],
+    "_exp_viewtypes": ["MV", "HV", "VV", "ASR", "SSR"],
+    "exp_platforms": ["LB"],
+    "_exp_platforms": ["LB", "PG", "N4"],
+    "exp_sequential": [false, true],
+    "update_ratio": [0,10,20,30,40,50,60,70,80,90,100],
+    "__update_ratio": [0],
+    "update_querySet": [1,2,3],
+    "_update_querySet": [1,2,3],
+    "_update_ratio": [20, 40, 60, 80],
+
+    "datasets": {
+        "names": ["SYN", "PROV", "OAG", "SOC", "WORD"],
+        "execute": [false, false, true, false, false],
+        "_names": ["SYN", "PROV", "OAG", "SOC", "WORD"],
+        "_execute": [true, true, true, true, true]
+    },
+
+    "dataset_SYN": {
+        "synthetic": true,
+        "exp_size": {
+            "selectivity": 1000,
+            "data": [10000],
+            "_data": [10000, 100000, 1000000, 10000000]
+        },
+        "exp_selectivity": {
+            "size": 1000000,
+            "_size": 1000000,
+            "data": [100, 100, 200, 400, 800, 1600, 3200],
+            "__data": [100, 200, 400, 800, 1600, 3200],
+            "_data": [10, 100, 1000]
+        },
+        "schemas": {
+            "nodes": [
+                "A", "B", "C", "D", "D", "F", "H", "S", "T"
+            ],
+            "edges": [
+                ["X", "A", "B"],
+                ["X", "B", "C"],
+                ["X", "C", "D"],
+                ["Y", "C", "D"],
+                ["X", "D", "F"],
+                ["X", "F", "H"]
+            ]
+        },
+        "constraints": [
+            "N(c,\"C\"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4",
+            "N(d,\"D\"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4"
+        ],
+        "rules": [
+            [
+		    ["{match b:B-e5:X->c:C, c:C-e2:X->d:D map (c,d) to s:S}", "{match b:B-e6:X->c:C, c:C-e2:Y->d:D map (c,d) to t:T}"]
+            ]
+        ],
+		"_rules":[
+		    [
+		    		["{match b:B-e5:X->c:C, c:C-e2:X->d:D map (c,d) to s:S}", "{match b:B-e6:X->c:C, c:C-e2:Y->d:D map (c,d) to t:T}"],		    
+           ["{match b:B-e5:X->c:C, c-e2:X->d:D map (c,d) to s:S}", "{match b:B-e6:X->c:C, c:C-e2:Y->d:D map (c,d) to t:T}"],
+			["{match c:C-e2:X->d:D map (c,d) to s:S}", "{match c:C-e2:Y->d:D map (c,d) to t:T}"]
+	            ]
+		],
+      	"queries": [
+            [
+                "match s:S from v0 return s"
+            ]
+        ],
+        "_queries": [
+            [
+                "match s:S from v0 return s",
+                "match t:T from v0 return t"
+            ]
+        ],
+        "csv": {
+            "default": "data",
+            "neo4j": "data"
+        }
+    },
+    "dataset_PROV": {
+        "synthetic": false,
+        "schemas": {
+            "nodes": [
+                "R", "U", "AC", "AR"
+            ],
+            "edges": [
+                ["DERBY", "R", "R"],
+                ["DERBY2", "R", "R"],
+                ["USED", "R", "AR"],
+                ["GENBY", "R", "AC"],
+                ["GENBY", "R", "AR"],
+                ["ASSOC", "R", "U"],
+                ["ATTR", "AR", "U"]
+            ]
+        },
+        "constraints": [
+        ],
+        "rules": [
+            [
+                ["{match v1:R-e1:USED->v2:AR, v1-e2:ASSOC->v3:U where v1 < 5000 add v2-ne1:ATTR->v3}"]
+            ]
+        ],
+        "queries": [
+            [
+                "match v1:AR-ne1:ATTR->v2:U from v0 where v1 < 2000 return v1",
+                "match v1:AR-ne1:ATTR->v2:U from v0 where v1 < 6000, v1 > 3000 return ne1"
+            ]
+        ],
+        "csv": {
+            "default": "experiment/dataset/targets/prov",
+            "neo4j": "experiment/dataset/targets/prov/neo4j"
+        },  
+        "_csv": {
+            "_comment": [
+                "default shold has node.csv, edge.csv, nodeProp.csv, edgeProp.csv, each has no headers",
+                "neo4j should have node and edge folders, each can have any number of csv files that contains node, each should start with headers"
+            ],
+            "default": "experiment/dataset/targets/wikipedia/default",
+            "neo4j": "experiment/dataset/targets/wikipedia/neo4j"
+        }
+    },
+    "dataset_OAG": {
+        "synthetic": false,
+        "schemas": {
+            "nodes": [
+                "AA", "AP", "AV", "MA", "MP", "MV", "OA", "OP", "OV"
+            ],
+            "edges": [
+                ["W", "AP", "AA"],
+                ["P", "AP", "AV"],
+                ["W", "MP", "MA"],
+                ["P", "MP", "MV"],
+                ["W", "OP", "OA"],
+                ["P", "OP", "OV"],
+                ["L", "AA", "MA"],
+                ["L", "AP", "MP"],
+                ["L", "AV", "MV"],
+                ["L", "OA", "OA"],
+                ["L", "OP", "OP"],
+                ["L", "OV", "OV"]
+            ]
+        },
+        "constraints": [
+        ],
+        "rules": [
+            [
+                [
+                    "{match n1:MA-e1:L->n2:AA where n1 < 300000 map (n1,n2) to s:OA}",
+                    "{match n1:MP-e1:L->n2:AP where n1 < 200300000 map (n1,n2) to s:OP}"
+                ]
+            ]
+        ],
+        "queries": [
+            [
+                "match n1:OA from v0 return n1",
+                "match n1:OP from v0 return n1"
+            ]
+        ],
+        "csv": {
+            "default": "experiment/dataset/targets/oag",
+            "neo4j": "experiment/dataset/targets/oag/neo4j"
+        }  
+    },
+    "dataset_SOC": {
+        "synthetic": false,
+        "schemas": {
+            "nodes": [
+                "U"
+            ],
+            "edges": [
+                ["F", "U", "U"],
+                ["F2", "U", "U"],
+                ["F3", "U", "U"]
+            ]
+        },
+        "constraints": [
+        ],
+        "rules": [
+            [
+                [
+                    "{match u1:U-e1:F->u2:U, u2-e2:F->u3:U where u1 < 10 add u1-e3:F2->u3}",
+                    "{match u1:U-e1:F->u2:U, u2-e2:F->u3:U, u3-e3:F->u4:U where u1 < 50 add u1-e4:F3->u4}"
+                ]
+            ]
+        ],
+        "queries": [
+            [
+                "match u1:U-e1:F2->u2:U from v0 where u1 > 0, u1 < 10 return u1",
+                "match u1:U-e1:F3->u2:U from v0 where u1 > 10, u1 < 15 return u1"
+            ]
+        ],
+        "csv": {
+            "default": "experiment/dataset/targets/soc",
+            "neo4j": "experiment/dataset/targets/soc/neo4j"
+        }  
+    },
+    "dataset_WORD": {
+        "synthetic": false,
+        "schemas": {
+            "nodes": [
+                "W", "L", "S"
+            ],
+            "edges": [
+                ["SL", "S", "L"],
+                ["WS", "W", "S"],
+                ["A", "L", "L"],
+                ["AS", "S", "S"],
+                ["C", "W", "L"]
+            ]
+        },
+        "constraints": [
+        ],
+        "rules": [
+            [
+                [
+                    "{match s1:S-e1:SL->l1:L, s2:S-e2:SL->l2:L, l1-e3:A->l2 add s1-e4:AS->s2}",
+                    "{match w:W-e1:WS->s:S, s-e2:SL->l:L add w-e3:C->l}"
+                ]
+            ]
+        ],
+        "queries": [
+            [
+                "match w:W-e:C->l:L from v0 where w > 5000, w < 6000 return e",
+                "match s1:S-e:AS->s2:S from v0 where s1 > 2800, s1 < 3000 return e"
+            ]
+        ],
+        "csv": {
+            "default": "experiment/dataset/targets/word",
+            "neo4j": "experiment/dataset/targets/word/neo4j"
+        }  
+    }
+}

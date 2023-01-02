@@ -1,0 +1,17 @@
+.DS_Store
+neo4jdata/
+doc
+app.log
+target
+data/
+_data/
+output.logic
+experiment/dataset/sources/*
+experiment/dataset/targets/*
+experiment/dataset/postgres/*
+experiment/dataset/test/_postgres/*
+experiment.json
+experiment/result_csv/*
+lib/*
+experiment/*
+logs/

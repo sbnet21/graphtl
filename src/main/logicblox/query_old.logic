@@ -1,0 +1,20 @@
+// schema
+ans_node(a,b) -> string(a), string(b).
+ans_edge(a,b,c) -> string(a), string(b), string(c).
+ans_reach(a) -> string(a).
+
+// for z<-[]*-c:C, z<-[]*-h:H
+// return []<-[]*-c, []<-[]*-h
+paths(a,b) -> string(a), string(b).
+
+paths(a,b) <- edge0(a,b,_).
+paths(a,b) <- paths(a,c), paths(c,b).
+
+ans_reach(c) 	<- paths(c,r), 	paths(c,z), node0(c,"C"), paths(h,z), node0(h,"H").
+ans_reach(r) 	<- paths(c,r), 	paths(c,z), node0(c,"C"), paths(h,z), node0(h,"H").
+ans_reach(h) 	<- paths(h,r), 	paths(h,y), paths(c,z), node0(c,"C"), paths(h,z), node0(h,"H").
+ans_reach(r) 	<- paths(h,r), 	paths(h,y), paths(c,z), node0(c,"C"), paths(h,z), node0(h,"H").
+
+// below
+ans_node(i,t) <- ans_reach(i), node0(i,t).
+ans_edge(i1,i2,t) <- ans_reach(i1), ans_reach(i2), edge0(i1,i2,t).

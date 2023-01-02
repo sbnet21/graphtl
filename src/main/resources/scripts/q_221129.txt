@@ -1,0 +1,87 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+option ivm on;
+# init;
+# prepare from "data";
+connect pg;
+drop TEST1;
+create graph TEST1;
+use TEST1;
+
+# schema;
+#create node C;
+#create node E;
+#create node B;
+#create node T;
+#create edge X (W -> S);
+#create edge SL (S -> L);
+#create edge A (L -> L);
+#create edge NN (W -> L);
+#create edge AW (W -> W);
+
+
+# data
+
+create virtual view v0 as 
+	{match c:C-x:X->e:E, e-y:Y->b:B map (c,e) to t:T}
+#	,{match c1:C1-x1:X1->e1:E1, e1-y1:Y1->b1:B1 map (c1,e1) to t1:T1}
+};
+
+match t:T-y:Y->b:B from v0 return t,y,b;
+
+program;
+disconnect;
+
+
+insert N (1,"C");
+insert N (2,"E");
+insert N (3,"B");
+insert N (11,"C");
+insert N (12,"E");
+insert N (13,"B");
+insert E (101,1,2,"X");
+insert E (102,2,3,"Y");
+insert E (103,11,12,"X");
+insert E (104,12,13,"Y");
+
+match t:T-y:Y->b:B from v0 return t,y,b;
+
+match w:W from v0 return w;
+
+program;
+quit;
+
+
+# constraints (EGDs);
+#add constraint N(b,"B"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+#add constraint N(b,"B1"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C1"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+
+# import data from CSV;
+#import N from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/word/node.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/word/edge.csv";
+
+# views; 
+# virtual
+# hybrid
+# materialized
+# asr
+
+#	match v1:W-e1:WS->v2:S, v2-e2:SL->v3:L add v4:NEWNODE
+#create virtual view v0 as {match c:C-x:X->e:E, e-y:Y->b:B map (c,e) to t:T}};
+
+
+
+#create ssr on v0;
+
+#match t:T-y:Y->b:B from v0 return t,y,b;
+#match n1:W-e3:NN->n3:L from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 100, n1 < 200 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:NEWNODE from v0 where n1 < 100 return n1;
+#match n1:NEWNODE from v0 where n1 > 1000, n1 < 1200 return n1;
+
+disconnect;

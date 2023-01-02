@@ -1,0 +1,6 @@
+constraints {
+	 (from:B -> edge:Y, to:C), 
+	 (to:C -> edge:Y, from:B),
+	 (from:M -> edge:Q, to:E),
+	 (to:E -> edge:Q, from:M)
+}

@@ -1,0 +1,97 @@
+# options
+option typecheck on;
+option prunetypecheck on;
+# on: t_typecheckInput=[160, 48, 46, 37, 35, 31, 29]
+# off: t_typecheckInput=[50, 21, 22, 27, 23, 24, 23]
+option prunequery off;
+# init
+connect lb;
+drop ALL;
+create graph ALL;
+use ALL;
+# schema
+create node A;
+create node B;
+create node C;
+create node D;
+create node D;
+create node F;
+create node H;
+create node S;
+create node T;
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge Y (C -> D);
+create edge X (D -> F);
+create edge X (F -> H);
+create node A1;
+create node B1;
+create node C1;
+create node D1;
+create node S1;
+create edge X1 (A1 -> B1);
+create edge X1 (B1 -> C1);
+create edge X1 (C1 -> D1);
+create node A2;
+create node B2;
+create node C2;
+create node D2;
+create node S2;
+create edge X1 (A1 -> B1);
+create edge X1 (B1 -> C1);
+create edge X1 (C1 -> D1);
+# 3 copies
+# constraints (EGDs)
+add constraint N(c,"A"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"B"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+add constraint N(c,"C"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"D"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+add constraint N(c,"A1"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"B1"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+add constraint N(c,"C1"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"D1"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+add constraint N(c,"A2"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"B2"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+add constraint N(c,"C2"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"D2"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+# 3 copies
+# views
+create materialized view v0i0 as 
+ {match c:C-e2:X->d:D map (c,d) to s:S},
+ {match c:C-e2:Y->d:D map (c,d) to t:T}, 
+ {match a:A-e2:X->b:B map (a,b) to t:T}, 
+ {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v001 as {match c:C-e2:y->d:D map (c,d) to s:S},{match c:C-e2:X->d:D map (c,d) to s:S};
+create materialized view v0i1 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v002 as {match c:C-e2:y->d:D map (c,d) to s:S},{match c:C-e2:X->d:D map (c,d) to s:S};
+create materialized view v0i2 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v003 as {match c:C-e2:y->d:D map (c,d) to s:S},{match c:C-e2:X->d:D map (c,d) to s:S};
+create materialized view v0i3 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v004 as {match c:C-e2:y->d:D map (c,d) to s:S},{match c:C-e2:X->d:D map (c,d) to s:S};
+create materialized view v0i4 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v005 as {match c:C-e2:y->d:D map (c,d) to s:S},{match c:C-e2:X->d:D map (c,d) to s:S};
+create materialized view v0i5 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v006 as {match c:C-e2:y->d:D map (c,d) to s:S},{match c:C-e2:X->d:D map (c,d) to s:S};
+create materialized view v0i6 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v007 as {match c:C-e2:y->d:D map (c,d) to s:S},{match c:C-e2:X->d:D map (c,d) to s:S};
+
+option prunetypecheck off;
+create materialized view v1i0 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v008 as {match c:C-e2:y->d:D map (c,d) to s:S};
+create materialized view v1i1 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v009 as {match c:C-e2:y->d:D map (c,d) to s:S};
+create materialized view v1i2 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v010 as {match c:C-e2:y->d:D map (c,d) to s:S};
+create materialized view v1i3 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v011 as {match c:C-e2:y->d:D map (c,d) to s:S};
+create materialized view v1i4 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v012 as {match c:C-e2:y->d:D map (c,d) to s:S};
+create materialized view v1i5 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+create materialized view v013 as {match c:C-e2:y->d:D map (c,d) to s:S};
+create materialized view v1i6 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T}, {match a:A-e2:X->b:B map (a,b) to t:T}, {match a:A1-e2:X->b:B1 map (a,b) to t:T};
+
+drop ALL;
+disconnect;
+quit;
+

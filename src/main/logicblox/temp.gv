@@ -1,0 +1,14 @@
+digraph G {
+"a" [shape=box,style=filled,fillcolor=lightgray];
+"b" [shape=box,style=filled,fillcolor=lightgray];
+"c" [shape=box,style=filled,fillcolor=lightgray];
+"g" [shape=box,style=filled,fillcolor=lightgray];
+"h" [shape=box,style=filled,fillcolor=lightgray];
+"i" [shape=box,style=filled,fillcolor=lightgray];
+
+"b"->"a" [style=bold,color=blue,label="BA"];
+"c"->"b" [style=bold,color=blue,label="CB"];
+"g"->"b" [style=bold,color=blue,label="GB"];
+"h"->"g" [style=bold,color=blue,label="HG"];
+"h"->"i" [style=bold,color=blue,label="HI"];
+}

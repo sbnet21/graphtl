@@ -1,0 +1,2 @@
+node0(id, type) <- raw_node(id, type).
+edge0(id1, id2, type) <- raw_edge(id1, id2, type).

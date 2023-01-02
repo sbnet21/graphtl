@@ -1,0 +1,22 @@
+// schema
+ans_node(a,b) -> string(a), string(b).
+ans_edge(a,b,c) -> string(a), string(b), string(c).
+ans_reach(a) -> string(a).
+
+// for b:B<-CB-c:C
+// return []<-[]-b
+ans_edge(b,i3,et3) 	<- node0(i3,_),edge0(b,i3,et3),			edge0(c,b,et2), node0(c,t1), node0(b,t2), et2="CB", t1="C", t2="B".
+ans_node(b,t2) 		<- node0(i3,_),edge0(b,i3,_),			edge0(c,b,et2), node0(c,t1), node0(b,t2), et2="CB", t1="C", t2="B".
+ans_node(i3,nt3) 	<- node0(i3,nt3),edge0(b,i3,_),			edge0(c,b,et2), node0(c,t1), node0(b,t2), et2="CB", t1="C", t2="B".
+
+// return c<-[]*-[]
+ans_reach(c) <- 				node0(i3,_),edge0(b,i3,_),edge0(c,b,et2), node0(c,t1), node0(b,t2), et2="CB", t1="C", t2="B".  // include the original node
+ans_reach(q) <- edge0(q,c,_), 	node0(i3,_),edge0(b,i3,_),edge0(c,b,et2), node0(c,t1), node0(b,t2), et2="CB", t1="C", t2="B".
+ans_reach(q) <- ans_reach(p), edge0(q,p,_).
+
+// below
+ans_node(i,t) <- ans_reach(i), node0(i,t).
+ans_edge(i1,i2,t) <- ans_reach(i1), ans_reach(i2), edge0(i1,i2,t).
+
+
+

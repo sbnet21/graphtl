@@ -1,0 +1,50 @@
+connect 127.0.0.1 5518;
+create graph Friday;
+use Friday;
+
+#program;
+
+
+create node A;
+create node B;
+create node C;
+create node D;
+create node E;
+create edge X (A -> B);
+create edge Y (B -> C);
+create edge Y (D -> C);
+
+insert N (1,"A");
+insert N (2,"B");
+insert N (3,"C");
+
+insert E (100,1,2,"X");
+insert E (101,2,3,"Y");
+
+#schema;
+
+#add constraint N(a,"A"),N(b,"B"),E(d,a,b,"E"),NP(a,"name","aa") -> a=b, c=da, e="S",f="100";
+
+#egds;
+
+create view v1 as 
+{ match a:A-x:X->b:B, b-y:Y->c:C map (a,b) to x:D}
+;
+
+#create view v2 on v1 as 
+#{ match a:A-x:X->b:B, b-y:Y->c:C map (a,b) to x:D}
+#;
+
+#views;
+program;
+
+#use Friday;
+#views;
+#egds;
+#schema;
+
+
+query;
+
+
+disconnect;

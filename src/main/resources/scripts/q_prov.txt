@@ -1,0 +1,88 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+# init;
+# prepare from "data";
+connect lb;
+drop TEST1;
+create graph TEST1;
+use TEST1;
+
+# schema;
+create node R;
+create node U;
+create node AC;
+create node AR;
+
+create edge DERBY (R -> R);
+create edge DERBY2 (R -> R);
+create edge USED (AR -> R);
+create edge GENBY (R -> AC);
+create edge GENBY (R -> AR);
+create edge ASSOC (R -> U);
+
+# data
+insert N (1,"U");
+insert N (11,"R");
+insert N (12,"R");
+insert N (13,"R");
+insert N (21,"AC");
+insert N (31,"AR");
+insert N (32,"AR");
+
+
+insert E (101,11,21,"GENBY");
+insert E (102,12,31,"GENBY");
+insert E (103,13,32,"GENBY");
+insert E (104,31,11,"USED");
+insert E (105,32,12,"USED");
+insert E (106,12,11,"DERBY");
+insert E (107,13,11,"DERBY");
+insert E (108,21,1,"ASSOC");
+insert E (109,31,1,"ASSOC");
+insert E (110,32,1,"ASSOC");
+
+# constraints (EGDs);
+#add constraint N(b,"B"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+#add constraint N(b,"B1"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C1"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+
+# import data from CSV;
+#import N from "/Users/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/node.csv";
+#import E from "/Users/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/edge.csv";
+#import N from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/node.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/edge.csv";
+
+# views; 
+# virtual
+# hybrid
+# materialized
+# asr
+
+#create materialized view v0 as {
+#	match v1:AR-e1:USED->v2:R, v3:R-e2:GENBY->v1 add v3-ne1:DERBY2->v2
+#	where v1 > 1000, v1 < 2000 
+#};
+
+create materialized view v0 as {
+	match v1:AR-e1:USED->v2:R, v3:R-e2:GENBY->v1, v3-e3:DERBY->v2
+#	where v1 > 1000, v1 < 2000 
+	remove v3-e3:GENBY->v2
+};
+
+
+#create ssr on v0;
+
+match v1:R-e1:DERBY2->v2:R from v0 
+#where v1 >10, v1 < 100 
+return v1-e1->v2;
+
+match v1:R-e1:DERBY->v2:R from v0 
+#where v1 >10, v1 < 100 
+return v1-e1->v2;
+
+
+program;
+disconnect;

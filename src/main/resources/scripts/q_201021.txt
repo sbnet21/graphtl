@@ -1,0 +1,79 @@
+connect 127.0.0.1 5518;
+#use t;
+
+create graph t;
+use t;
+
+# schema
+create node A;
+create node B;
+create node C;
+create node D;
+create node F;
+
+create node S;
+create node T;
+
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge Y (C -> D);
+create edge X (D -> C);
+create edge X (D -> F);
+
+## parallel 
+import N from "/home/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+import E from "/home/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+#add constraint N(a,"A"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+#add constraint N(a,"B"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+
+#create materialized view v1 as {match a:A-e1:X->b:B map (set(b)) to s:S};
+create materialized view v1 as 
+	{match a:A-e1:X->b:B map (set(a)) to s:S},
+	{match c:C-e2:X->d:D map (c,d) to t:T},
+	{match c:C-e2:Y->d:D map (c,d) to u:U}
+;
+
+#create materialized view v1 as 
+#	{match a:A-e1:X->b:B,b-e2:X->c:C, c-e3:X->d:D, d-e4:X->e:E, e-e5:X->f:F 
+#	map (a,b,c) to s:S, (set(d),e) to t:T}
+#;
+
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+
+create index on v1;
+
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+
+
+
+#match s:S-x1:X->b:B from v1 return s-x1->b;
+#match s:S-x1:X->b:B from v1 return s-x1->b;
+#match s:S-x1:X->b:B from v1 return s-x1->b;
+#match s:S-x1:X->b:B, b-x2:X->t:T from v1 return s-x1->b, b-x2->t;
+
+#match s:S-x1:X->b:B, b-x2:X->t:T from v1 return s-x1->b, b-x2->t;
+
+
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+
+#match x:S-x1:X->b:B from v1 return x;
+#match x:S from v1 return x;
+
+#program;
+
+#drop graph t;

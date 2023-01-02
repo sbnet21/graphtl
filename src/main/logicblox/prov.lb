@@ -1,0 +1,154 @@
+// Usage: lb prov.lb
+
+create prov --overwrite
+
+echo "==== Rule - Schema ===="
+starttimer
+addblock prov -f prov_schema.logic
+elapsedtime
+
+echo "==== Data - Graph loading ===="
+starttimer
+exec -f prov_import.logic
+elapsedtime
+
+echo "==== Rule ===="
+starttimer
+addblock -f prov_rule.logic
+elapsedtime
+
+echo "==== Path ===="
+starttimer
+addblock -f prov_path.logic
+elapsedtime
+
+echo "==== Query ===="
+
+echo "**** path ****"
+print path
+
+query "_(a,b) <- raw_node(a,b)."
+query "_(a,b,c) <- raw_edge(a,b,c)."
+
+echo "node0"
+query "_(a,b) <- node0(a,b)."
+
+echo "edge0"
+query "_(a,b,c) <- edge0(a,b,c)."
+
+echo "meta_node0"
+query "_(a,b,c) <- meta_node0(a,b,c)."
+
+echo "delta_node0"
+query "_(a,b,c) <- delta_node0(a,b,c)."
+
+echo "delta_edge0"
+query "_(a,b,c,d) <- delta_edge0(a,b,c,d)."
+
+
+echo "node1"
+query "_(a,b) <- node1(a,b)."
+
+echo "edge1"
+query "_(a,b,c) <- edge1(a,b,c)."
+
+echo "meta_node1"
+query "_(a,b,c) <- meta_node1(a,b,c)."
+
+echo "delta_node1"
+query "_(a,b,c) <- delta_node1(a,b,c)."
+
+echo "delta_edge1"
+query "_(a,b,c,d) <- delta_edge1(a,b,c,d)."
+
+
+echo "node2"
+query "_(a,b) <- node2(a,b)."
+
+echo "edge2"
+query "_(a,b,c) <- edge2(a,b,c)."
+
+echo "meta_node2"
+query "_(a,b,c) <- meta_node2(a,b,c)."
+
+echo "delta_node2"
+query "_(a,b,c) <- delta_node2(a,b,c)."
+
+echo "delta_edge2"
+query "_(a,b,c,d) <- delta_edge2(a,b,c,d)."
+
+// time lb query prov "_(a,b)<-node(a,b)."
+
+/*
+echo "==== Rule - Norm ===="
+starttimer
+addblock prov -f prov_rule.logic
+elapsedtime
+
+echo "==== Rule - Path ===="
+starttimer
+addblock prov -f prov_path.logic
+elapsedtime
+
+echo "==== Query: answer ===="
+starttimer
+query "_(a,b,c,d) <- node(a,b,c,d)."
+//query -f prov_query.logic
+elapsedtime
+
+echo "==== Query: answer ===="
+starttimer
+query "_(a,b,c) <- edge(a,b,c)."
+elapsedtime
+
+
+echo "==== Query: answer - node0 ===="
+starttimer
+query "_(a,b,c,d) <- node0(a,b,c,d)."
+elapsedtime
+
+echo "==== Query: answer - edge0 ===="
+starttimer
+query "_(a,b,c) <- edge0(a,b,c)."
+elapsedtime
+
+echo "==== Query: answer - node1 ===="
+starttimer
+query "_(a,b,c,d) <- node1(a,b,c,d)."
+elapsedtime
+
+echo "==== Query: answer - edge1 ===="
+starttimer
+query "_(a,b,c) <- edge1(a,b,c)."
+elapsedtime
+
+echo "==== Query: answer - reachable ===="
+starttimer
+query "_(a,b,name,ts) <- path(a,b), 
+                node(b,\"f1\",\"en\",0),
+                node(a,name,\"en\",ts)." 
+elapsedtime
+
+echo "==== Query: answer - reachable0 ===="
+starttimer
+query "_(a,b,name,ts) <- path0(a,b), 
+                node0(b,\"f1\",\"en\",3),
+                node0(a,name,\"en\",ts)." 
+elapsedtime
+
+echo "==== Query: answer - reachable1 ===="
+starttimer
+query "_(a,b,name,ts) <- path1(a,b), 
+                node1(b,\"f1\",\"en\",2),
+                node1(a,name,\"en\",ts)." 
+elapsedtime
+*/
+
+/*
+echo "==== Query: answer M ===="
+starttimer
+query "_(a,b,c,d) <- node1s(a,b,c,d)."
+elapsedtime
+*/
+
+//close --destroy 

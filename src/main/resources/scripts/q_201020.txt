@@ -1,0 +1,70 @@
+connect 127.0.0.1 5518;
+#use t;
+
+create graph t;
+use t;
+
+# schema
+create node A;
+create node B;
+create node C;
+create node D;
+create node F;
+
+create node S;
+create node T;
+
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge X (D -> F);
+
+# data load
+insert N (4,"B");
+insert N (3,"B");
+insert N (2,"B");
+insert N (1,"A");
+insert N (5,"C");
+insert N (6,"D");
+insert N (7,"F");
+
+insert E (101,1,2,"X");
+insert E (102,1,3,"X");
+insert E (103,1,4,"X");
+insert E (104,2,5,"X");
+insert E (105,5,6,"X");
+insert E (105,6,7,"X");
+
+## parallel 
+#import N from "/home/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+#add constraint N(a,"A"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+#add constraint N(a,"B"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+
+#create hybrid view v1 as {match a:A-e1:X->b:B map (set(b)) to s:S};
+create materialized view v1 as {match c:C-e1:X->d:D map (c,d) to s:S};
+#match x:S from v1 return x;
+#match x:S-e1:X->f:F from v1 return x;
+#match x:S-e1:X->c:C from v1 return x-e1->c;
+
+# virtual materialized hybrid
+#create materialized view v1 as 
+#	{match a:A-e1:X->b:B map (set(b)) to s:S},
+#	{match c:C-e2:X->d:D, d-e3:X->f:F map (c,d) to t:T}
+#;
+
+
+create index on v1;
+
+#match x:S from v1 return x;
+match x:S-e1:X->c:F from v1 return x-e1->c;
+
+#program;
+
+#match x:A-x1:X->b:S, b-x2:X->t:T from v1 return x-x1->b, b-x2->t;
+#match x:S-x1:X->b:B from v1 return x;
+#match x:S from v1 return x;
+
+
+#drop graph t;

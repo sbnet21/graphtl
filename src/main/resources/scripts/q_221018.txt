@@ -1,0 +1,24 @@
+# options;
+option typecheck off;
+option prunetypecheck off;
+option prunequery off;
+
+connect lb;
+create graph TEST2;
+use TEST2;
+ 
+# init;
+import N from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/prov/node.csv";
+import E from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/prov/edge.csv";
+import NP from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/prov/nodeProp.csv";
+import EP from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/prov/edgeProp.csv";
+
+create virtual view v0 as {match v1:R-e1:USED->v2:AR, v1-e2:ASSOC->v3:U where v1 < 5000 add v2-ne1:ATTR->v3};
+create ssr on v0;
+program;
+
+match a:AR-ne1:ATTR->v2:U from v0 where a < 2000 return ne1;
+
+disconnect;
+
+# lb query TEST2 "_(e1,v1,v2,e2,v3) <- E_g(e1,v2,v1,\"USED\"), E_g(e2,v2,v3,\"ASSOC\"), N_g(v1,\"AR\"), N_g(v2,\"R\"), N_g(v3,\"U\"), v1 < 5000." | more

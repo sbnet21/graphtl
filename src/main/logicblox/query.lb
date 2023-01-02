@@ -1,0 +1,16 @@
+open prov
+
+/*
+echo "==== Rule - Remove ===="
+starttimer
+removeblock query
+elapsedtime
+
+echo "==== Rule - AddBlock ===="
+starttimer
+addblock -f query.logic
+elapsedtime
+*/
+
+query "_(a,b,c) <- ans_edge(a,b,c)".
+query "_(a,b) <- ans_node(a,b)".

@@ -1,0 +1,166 @@
+option typecheck on;
+option prunetypecheck on;
+option prunequery off;
+
+connect 127.0.0.1 5518;
+#use t;
+
+create graph t;
+use t;
+
+# schema
+create node A;
+create node B;
+create node C;
+create node D;
+create node F;
+
+create node S;
+create node T;
+
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge Y (C -> D);
+create edge X (D -> C);
+create edge X (D -> F);
+
+## parallel 
+import N from "/home/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+import E from "/home/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+#add constraint N(a,"A"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+#add constraint N(b,"A"),N(b1,l1),N(b2,l2),E(e1,b1,b,"X"),E(e2,b2,b,"X") -> l1=l2, e1=e2;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,c,b1,"X"),E(e2,c,b2,"X") -> l1=l2, e1=e2;
+#add constraint N(d,"D"),N(b1,l1),N(b2,l2),E(e1,b1,d,"X"),E(e2,b2,d,"X") -> l1=l2, e1=e2;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,c,b1,"Y"),E(e2,c,b2,"Y") -> l1=l2, e1=e2;
+#add constraint N(d,"D"),N(b1,l1),N(b2,l2),E(e1,b1,d,"Y"),E(e2,b2,d,"Y") -> l1=l2, e1=e2;
+
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,c,b1,"X"),E(e2,c,b2,"X") -> l1=l2, e1=e2, l1="D";
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,c,b1,"Y"),E(e2,c,b2,"Y") -> l1=l2, e1=e2, l1="D";
+#add constraint N(c,"C"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+
+add constraint N(c,"C"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"D"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+
+#add constraint N(d,"D"),N(c1,l1),N(c2,l2),E(e1,c1,d,"X"),E(e2,c1,d,"X") -> l1=l2, e1=e2, l1="D";
+#add constraint N(d,"D"),N(c1,l1),N(c2,l2),E(e1,c1,d,"Y"),E(e2,c1,d,"Y") -> l1=l2, e1=e2, l1="D";
+
+
+# virtual
+# hybrid
+# materialized
+create materialized view v0 as
+	{match c:C-e2:X->d:D map (c,d) to t:T}
+;
+create materialized view v1 on v0 as
+	{match c:C-e2:Y->d:D map (c,d) to u:U}
+;
+match t:T from v1 return t;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 120 return s-x1->b, b-x2->t, t-x3->u;
+
+quit;
+
+create materialized view v1 as
+	{match a:A-e1:X->b:B map (set(a)) to s:S},
+	{match c:C-e2:X->d:D map (c,d) to t:T},
+	{match c:C-e2:Y->d:D map (c,d) to u:U}
+;
+
+match b:T-x1:X->t:T from v1 return b-x1->t;
+match b:T-x1:X->t:T from v1 return b-x1->t;
+match b:T-x1:X->t:T from v1 return b-x1->t;
+create index on v1;
+match b:T-x1:X->t:T from v1 return b-x1->t;
+match b:T-x1:X->t:T from v1 return b-x1->t;
+match b:T-x1:X->t:T from v1 return b-x1->t;
+quit;
+
+match b:T-x1:X->t:T from v1 return b-x1->t;
+match b:T-x1:X->t:T from v1 return b-x1->t;
+match b:T-x1:X->t:T from v1 return b-x1->t;
+
+#match b:T-x1:X->t:T from v1 where b.id = 26806 return b-x1->t;
+#match b:T-x1:X->t:T from v1 where b.id = 41782 return b-x1->t;
+#create index on v1;
+#match b:T-x1:X->t:T from v1 where b.id = 65740 return b-x1->t;
+#match b:T-x1:X->t:T from v1 where b.id = 26806 return b-x1->t;
+#match b:T-x1:X->t:T from v1 where b.id = 41782 return b-x1->t;
+
+quit;
+
+
+create hybrid view v1h as 
+	{match c:C-e2:X->d:D map (c,d) to t:T}
+;
+
+create materialized view v1m as 
+	{match c:C-e2:X->d:D map (c,d) to t:T}
+;
+#	,{match c:C-e2:Y->d:D map (c,d) to u:U}
+
+
+
+match t:T from v1 return t;
+match t:T from v1 return t;
+match t:T from v1 return t;
+match t:T from v1 return t;
+match t:T from v1 return t;
+match t:T from v1h return t;
+match t:T from v1h return t;
+match t:T from v1h return t;
+match t:T from v1h return t;
+match t:T from v1h return t;
+match t:T from v1m return t;
+match t:T from v1m return t;
+match t:T from v1m return t;
+match t:T from v1m return t;
+match t:T from v1m return t;
+
+
+
+#create materialized view v1 as 
+#	{match a:A-e1:X->b:B map (set(a)) to s:S},
+#	{match c:C-e2:X->d:D map (c,d) to t:T},
+#	{match c:C-e2:Y->d:D map (c,d) to u:U}
+#;
+
+#program;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 120 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 1146 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 7293 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 14061 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 46380 return s-x1->b, b-x2->t, t-x3->u;
+
+#create index on v1;
+
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 120 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 1146 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 7293 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 14061 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 where s.id = 46380 return s-x1->b, b-x2->t, t-x3->u;
+
+
+# S: 120 1146 7293 14061 46380
+
+
+#match b:S-x1:X->t:T, t-x2:X->c:C from v1 return b;
+#match t:T from v1 return t;
+#match t:T-e1:X->u:U from v1 return t-e1->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+#match s:S-x1:X->b:B, b-x2:X->t:T from v1 return s-x1->b, b-x2->t;
+
+#create index on v1;
+#match s:S-x1:X->b:B, b-x2:X->t:T, t-x3:X->u:U from v1 return s-x1->b, b-x2->t, t-x3->u;
+
+#program;
+
+#drop graph t;
+
+
+#create materialized view v1 as 
+#	{match a:A-e1:X->b:B map (set(a)) to s:S},
+#	{match c:C-e2:X->d:D map (c,d) to t:T},
+#	{match c:C-e2:Y->d:D map (c,d) to u:U}
+#;

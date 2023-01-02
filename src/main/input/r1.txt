@@ -1,0 +1,15 @@
+[
+	{
+		(
+			match a:A-X->b:B, b-Y->c:C, c-Z->d:D, d-W->e:E 
+			map {b,c}|->h:M 
+			connect h-Q->e 
+			disconnect h-Z->d
+		)
+	}, {
+		(
+			match m:M-Q->e:E 
+			map {m,e}|->me:S
+		)
+	}
+]

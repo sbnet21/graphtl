@@ -1,0 +1,44 @@
+connect 127.0.0.1 5518;
+create graph t;
+use t;
+
+create node A;
+create node B;
+create node C;
+create node D;
+create node E;
+create edge X (A -> B);
+create edge Y (B -> C);
+create edge Y (D -> C);
+
+import N from "n.csv";
+import E from "e.csv";
+
+#insert N (1,"A");
+#insert N (10,"A");
+#insert N (2,"B");
+#insert N (3,"C");
+
+#insert E (100,1,2,"X");
+#insert E (101,2,3,"Y");
+
+create hybrid view v1v as { match a:A-x:X->b:B, b-y:Y->c:C map (a,b) to x:D};
+create hybrid view v2v on v1v as { match d:D-y:Y->c:C map (d,c) to e:E};
+
+#create materialized view v1m as { match a:A-x:X->b:B, b-y:Y->c:C map (a,b) to x:D};
+#create materialized view v2m on v1m as { match d:D-y:Y->c:C map (d,c) to e:E};
+
+#create materialized view v1m as { match a:A-x:X->b:B, b-y:Y->c:C map (a,b) to x:D};
+#create materialized view v2m on v1m as { match d:D-y:Y->c:C map (d,c) to e:E};
+#create hybrid view v2h on v1m as { match d:D-y:Y->c:C map (d,c) to e:E};
+#create virtual view v2v on v1m as { match d:D-y:Y->c:C map (d,c) to e:E};
+
+#create materialized view v3m on v1m as { match d:D-y:Y->c:C map (d,c) to e:E};
+
+#create hybrid view v1h as { match a:A-x:X->b:B, b-y:Y->c:C map (a,b) to x:D};
+
+query;
+
+#create index on v1;
+
+drop graph t;

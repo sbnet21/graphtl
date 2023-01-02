@@ -1,0 +1,59 @@
+        GET diagnostics cnt = row_count;
+        -- below are common for rules
+        -- SELECT count(*) INTO cnt FROM map_temp;
+        -- RAISE NOTICE '[INFO] count(*) from map_temp: %', cnt;
+
+        IF cnt = 0 THEN
+            INSERT INTO e_v0 (_0, _1, _2, _3) VALUES (NEW._0, NEW._1, NEW._2, NEW._3);
+            RETURN NULL;
+        END IF;
+
+        -- Populate N-,N'
+        INSERT INTO n_del_v0 SELECT DISTINCT _0, _1 FROM map_temp;
+        DELETE FROM n_v0 WHERE _0 IN (SELECT DISTINCT _0 FROM map_temp);
+
+        -- Populate N+,N'
+        INSERT INTO n_add_v0 SELECT DISTINCT _2, _3 FROM map_temp;            
+        INSERT INTO n_v0 SELECT DISTINCT _2, _3 FROM map_temp;            
+
+        -- Populate E-,E'
+        -- from node
+        FOR curs IN
+            SELECT e._0 AS _0, e._1 AS _1, e._2 AS _2, e._3 AS _3, m._2 AS _t
+            FROM e_g AS e, map_temp AS m
+            WHERE m._0 = e._1
+        LOOP
+            RAISE NOTICE 'TARGET _0: %, _1: %, _2: %, _3: %, _t: %', curs._0, curs._1, curs._2, curs._3, curs._t;
+            UPDATE e_add_v0 SET _1 = curs._t WHERE _0 = curs._0;
+            GET diagnostics cnt = row_count;
+            IF cnt > 0 THEN
+                UPDATE e_v0 SET _1 = curs._t WHERE _0 = curs._0;
+            ELSE
+                INSERT INTO e_del_v0 (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._2, curs._3); 
+                DELETE FROM e_v0 WHERE _0 = curs._0; 
+                INSERT INTO e_add_v0 (_0, _1, _2, _3) VALUES (curs._0, curs._t, curs._2, curs._3);
+                INSERT INTO e_v0 (_0, _1, _2, _3) VALUES (curs._0, curs._t, curs._2, curs._3);
+            END IF;
+            RAISE NOTICE 'e_add_v0 update_count: %', cnt;
+        END LOOP;
+        -- to node
+        FOR curs IN
+            SELECT e._0 AS _0, e._1 AS _1, e._2 AS _2, e._3 AS _3, m._2 AS _t
+            FROM e_g AS e, map_temp AS m
+            WHERE m._0 = e._2
+        LOOP
+            RAISE NOTICE 'TARGET _0: %, _1: %, _2: %, _3: %, _t: %', curs._0, curs._1, curs._2, curs._3, curs._t;
+            UPDATE e_add_v0 SET _2 = curs._t WHERE _0 = curs._0;
+            GET diagnostics cnt = row_count;
+            IF cnt > 0 THEN
+                UPDATE e_v0 SET _2 = curs._t WHERE _0 = curs._0;
+            ELSE
+                INSERT INTO e_del_v0 (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._2, curs._3); 
+                DELETE FROM e_v0 WHERE _0 = curs._0; 
+                INSERT INTO e_add_v0 (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._t, curs._3);
+                INSERT INTO e_v0 (_0, _1, _2, _3) VALUES (curs._0, curs._1, curs._t, curs._3);
+            END IF;
+            RAISE NOTICE 'e_add_v0 update_count: %', cnt;
+        END LOOP;
+
+        

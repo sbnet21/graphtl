@@ -1,0 +1,11 @@
+for c:C
+return []-[]*->c
+
+for c:c
+return c-[]*->[]
+
+for c:C-[]*->d, h:h-[]*-d
+return c-[]*->d, h-[]*->d
+
+for d:D-[]*->b:B
+return d-[]*->b

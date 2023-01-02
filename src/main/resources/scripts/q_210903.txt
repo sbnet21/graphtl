@@ -1,0 +1,81 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+# init;
+# prepare from "data";
+connect lb;
+drop TEST1;
+create graph TEST1;
+use TEST1;
+# schema;
+create node A;
+create node B;
+create node C;
+create node D;
+create node S;
+create node T;
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge X (A -> S);
+create edge X (A -> T);
+create node A1;
+create node B1;
+create node C1;
+create node D1;
+create node S1;
+create edge X1 (A1 -> B1);
+create edge X1 (B1 -> C1);
+create edge X1 (C1 -> D1);
+create edge X1 (A1 -> S1);
+# data
+insert N (1,"A");
+insert N (2,"B");
+insert N (3,"C");
+insert N (4,"D");
+insert E (101,1,2,"X");
+insert E (102,2,3,"X");
+insert E (103,3,4,"X");
+insert N (11,"A1");
+insert N (12,"B1");
+insert N (13,"C1");
+insert N (14,"D1");
+insert E (201,11,12,"X1");
+insert E (202,12,13,"X1");
+insert E (203,13,14,"X1");
+
+# constraints (EGDs);
+add constraint N(b,"B"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+add constraint N(b,"B1"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+add constraint N(c,"C1"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+# import data from CSV;
+#import N from "/home/sbnet21/src/workspace/graph-trans/data/SYN_n.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/data/SYN_e.csv";
+#import N from "/Users/sbnet21/src/workspace/graph-trans/data/schema/n1m.csv";
+#import E from "/Users/sbnet21/src/workspace/graph-trans/data/schema/e1m.csv";
+# views; 
+# virtual
+# hybrid
+# materialized
+#create hybrid view v0 as {match a:A-e1:X->b:B, b-e2:X->c:C map (b,c) to s:S};
+# add t:T, a-e1:X->t
+create virtual view v0 as {
+		match a:A-e1:X->b:B, b-e2:X->c:C, c-e3:X->d:D map (b,c) to s:S
+#	}, 
+#	{
+#		match a:A1-e1:X1->b:B1, b-e2:X1->c:C1, c-e3:X1->d:D1 map (b,c) to s:S1
+	};
+
+create ssr on v0;
+
+#match a:A-e1:X->s:S, s-e3:X->s, s-e2:X->d:D from v0 return s:S;
+match s:S from v0 return s:S;
+#match aq:A-eq1:X->sq:S, sq-eq3:X->sq, sq-eq2:X->dq:D from v0 return aq:A-eq1:X->sq:S, sq-eq3->sq, sq-eq2:X->dq:D;
+
+#create index on v0;
+#drop SYN;
+#program;
+
+#disconnect;

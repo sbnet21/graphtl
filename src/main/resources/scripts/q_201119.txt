@@ -1,0 +1,81 @@
+# options;
+platform lb;
+#prepare synthetic;
+#server start;
+#server stop;
+#quit;
+
+option typecheck on;
+option prunetypecheck on;
+option prunequery off;
+connect 127.0.0.1 5518;
+
+# init;
+create graph synthetic;
+use synthetic;
+# schema;
+create node A;
+create node B;
+create node C;
+create node D;
+create node F;
+create node H;
+create node S;
+create node T;
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge Y (C -> D);
+create edge X (D -> C);
+create edge X (D -> F);
+create edge X (F -> H);
+# constraints (EGDs);
+add constraint N(c,"C"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"D"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+
+#add constraint N(c,"A"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+#add constraint N(d,"B"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+
+
+# import data from CSV;
+#import N from "/Users/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+#import E from "/Users/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+#import N from "/home/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+# views;
+
+create materialized view v1m as {match c:C-e2:X->d:D map (c,d) to t:S};
+create materialized view v2m as {match c:C-e2:X->d:D map (c,d) to t:S};
+create materialized view v3m as {match c:C-e2:X->d:D map (c,d) to t:S};
+#create hybrid view v1h as {match c:C-e2:X->d:D map (c,d) to t:S};
+##create virtual view v1v as {match c:C-e2:X->d:D map (c,d) to t:S};
+
+#create materialized view v1 as {match c:C-e2:X->d:D map (c,d) to t:S};
+#create hybrid view v1 as {match c:C-e2:X->d:D map (c,d) to t:S};
+#create virtual view v1 as {match c:C-e2:X->d:D map (c,d) to t:S};
+
+
+#match b:B-e:X->s:S from v1 where b.id > 10000, b.id < 10050 return b;
+
+#create materialized view v1 as {match c:C-e2:X->d:D map (c,d) to t:T}, {match c:A-e2:X->d:B map (c,d) to t:S}, {match c:C-e2:Y->d:D map (c,d) to t:S};
+
+
+
+#create materialized view v1 as {match a:A-e2:X->b:B map (a,b) to s:S};
+
+#create materialized view v1 as {match c:C-e2:X->d:D map (c,d) to t:T}, {match a:C-e2:Y->b:D map (a,b) to s:S};
+
+#create materialized view v1 as {match c:C-e2:X->d:D map (c,d) to t:T};
+
+# create materialized view v1 as {match c:C-e2:X->d:D map (c,d) to t:T, (c,d) to s:S};
+
+# create materialized view v1 as {match c:C-e2:X->d:D map (c,d) to t:T}, {match c:C-e2:Y->d:D map (c,d) to u:U};
+# create materialized view v1 as {match c:C-e2:X->d:D, d-e3:Y->e:E map (c,d) to t:T, (c,d) to s:S};
+# create virtual view v1 on v0 as {match c:C-e2:Y->d:D map (c,d) to u:U};
+# indexes;
+# create index on v1;
+
+#server stop;
+#drop synthetic;
+#disconnect;
+quit;

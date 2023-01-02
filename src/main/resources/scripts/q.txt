@@ -1,0 +1,60 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+option ivm on;
+# init;
+# prepare from "data";
+# prepare from "ivm" on n4;
+connect pg;
+#drop TEST1;
+create graph TEST1;
+use TEST1;
+
+
+add constraint N(c,l),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,l),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+
+# data
+create node A_;
+create node A;
+create node B;
+create node B_;
+create node T;
+create node C;
+create node E;
+create node B;
+create edge X (C -> E);
+create edge Y (E -> B);
+create edge X (T -> T);
+create edge Y (T -> B);
+
+
+create virtual view v0 as 
+	{match c:C-x:X->e:E, e-y:Y->b:B map (c,e) to t:T}
+#	,{match c1:C1-x1:X1->e1:E1, e1-y1:Y1->b1:B1 map (c1,e1) to t1:T1}
+};
+
+create ssr on v0;
+
+
+insert N (1,"C");
+insert N (2,"E");
+insert N (3,"B");
+insert N (11,"C");
+insert N (12,"E");
+insert N (13,"B");
+insert E (101,1,2,"X");
+insert E (102,2,3,"Y");
+insert E (103,11,12,"X");
+insert E (104,12,13,"Y");
+
+
+
+match t:T-y:Y->b:B, t-x:X->t from v0 return t,y,b;
+
+#match n:A from v0 return n;
+
+drop TEST1;
+program;
+disconnect;

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Graph Transform</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<script src="app.js"></script>
+	<script src="preset.js"></script>
+</head>
+<body onload="setPreset('basic');">
+<div class="row">
+	<div class="col-1"> </div>
+	<div class="col-md">
+	<h2>Graph Transform Demo</h2>
+
+	<form name="frm" method="POST" target="ifr">
+		<h5>Graph Datasets & Transform Rulesets</h5>
+		<input type="radio" name="preset" value="basic" onClick="setPreset(this.value);" checked>Basic 
+		<input type="radio" name="preset" value="zoom1" onClick="setPreset(this.value);">Zoom1
+		
+		<h5>Constraints of graph</h5>
+		<textarea rows="3" cols="80" name="constraint"></textarea>
+
+		<h5>Transform Rule sets</h2>
+		<div>
+			<textarea rows="3" cols="80" name="rule"></textarea>
+			<div>
+				<button onClick="transform();">Tranform</button>
+			</div>
+		</div>
+
+		<h5>User Query</h2>
+		<textarea rows="3" cols="80" name="query"></textarea>
+		<div>
+			<input type="radio" name="query" value="basic" onClick="setQuery('basic')" checked>Basic 
+			<input type="radio" name="query" value="zoom1" onClick="setQuery('zoom1')">Zoom1
+		</div>
+		<p><button onClick="execute();">Execute</button></p>
+
+	</form>
+	</div>
+</div>
+<iframe src="about:blank" name="ifr" width="100" height="100" frameBorder="0"></iframe>
+</body>
+</html>

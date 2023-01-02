@@ -1,0 +1,68 @@
+//lang:derivationType[`path] = "DerivedAndStored".
+//lang:derivationType[`path0] = "DerivedAndStored".
+//lang:derivationType[`path1] = "DerivedAndStored".
+
+//path(id1, id2) -> string(id1), string(id2).
+
+path(0,a,b) <- edge0(a,b,_).
+path(0,a,b) <- path(0,a,c), path(0,c,b).
+
+path(1,a,b) <- edge1(a,b,_).
+path(1,a,b) <- path(1,a,c), path(1,c,b).
+
+path(2,a,b) <- edge2(a,b,_).
+path(2,a,b) <- path(2,a,c), path(2,c,b).
+
+// +path(1,a,b) <- edge1(a,b,_).
+// +path(1,a,b) <- path(1,a,c), path(1,c,b).
+
+// +path(2,a,b) <- edge2(a,b,_).
+// +path(2,a,b) <- path(2,a,c), path(2,c,b).
+
+// reachable_count[a] = c
+//    <- agg<< c = count() >> path(0, a, _).
+
+route(0,dst,a,b,t) <-
+    edge0(a,b,t), path(0,a,dst), path(0,b,dst).
+route(0,dst,a,dst,t) <-
+    edge0(a,dst,t).
+
+route(1,dst,a,b,t) <-
+    edge1(a,b,t), path(1,a,dst), path(1,b,dst).
+route(1,dst,a,dst,t) <-
+    edge1(a,dst,t).
+
+route(2,dst,a,b,t) <-
+    edge2(a,b,t), path(2,a,dst), path(2,b,dst).
+route(2,dst,a,dst,t) <-
+    edge2(a,dst,t).
+
+route_node(0,dst,a,t) <- route(0,dst,a,_,_), node0(a,t).
+route_node(0,dst,b,t) <- route(0,dst,_,b,_), node0(b,t).
+route_node(1,dst,a,t) <- route(1,dst,a,_,_), node0(a,t).
+route_node(1,dst,b,t) <- route(1,dst,_,b,_), node0(b,t).
+route_node(2,dst,a,t) <- route(2,dst,a,_,_), node0(a,t).
+route_node(2,dst,b,t) <- route(2,dst,_,b,_), node0(b,t).
+
+
+routeR(0,src,a,b,t) <-
+    edge0(a,b,t), path(0,src,a), path(0,src,b).
+routeR(0,src,a,src,t) <-
+    edge0(a,src,t).
+
+routeR(1,src,a,b,t) <-
+    edge1(a,b,t), path(1,src,a), path(1,src,b).
+routeR(1,src,a,src,t) <-
+    edge1(a,src,t).
+
+routeR(2,src,a,b,t) <-
+    edge2(a,b,t), path(2,src,a), path(2,src,b).
+routeR(2,src,a,src,t) <-
+    edge2(a,src,t).
+
+routeR_node(0,dst,a,t) <- routeR(0,dst,a,_,_), node0(a,t).
+routeR_node(0,dst,b,t) <- routeR(0,dst,_,b,_), node0(b,t).
+routeR_node(1,dst,a,t) <- routeR(1,dst,a,_,_), node0(a,t).
+routeR_node(1,dst,b,t) <- routeR(1,dst,_,b,_), node0(b,t).
+routeR_node(2,dst,a,t) <- routeR(2,dst,a,_,_), node0(a,t).
+routeR_node(2,dst,b,t) <- routeR(2,dst,_,b,_), node0(b,t).

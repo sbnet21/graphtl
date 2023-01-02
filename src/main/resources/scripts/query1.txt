@@ -1,0 +1,20 @@
+connect 127.0.0.1 5518;
+use Soonbo;
+create node entity;
+create node activity;
+create edge wasDerivedFrom (entity -> entity);
+create edge used (activity -> entity);
+create edge wasGeneratedBy (entity -> activity);
+create node A;
+create node B;
+create node C;
+create edge E (A -> B);
+schema;
+create view testview as 
+{ match a:A-x:X->b:B, b-y:Y->c:C, c-z:Z->d:D, d-w:W->e:E map (a,b,c) to q:Q },
+{ match a:A-x:X->b:B, b-y:Y->c:C, c-z:Z->d:D, d-w:W->e:E map (a,b,c) to q:Q }
+;
+add constraint N(a,"A"),N(b,"B"),E(d,a,b,"E"),NP(a,"name","aa") -> a=b, c=da, e="S",f="100";
+add constraint N(a,"AA"),N(b,"BB"),E(d,a,b,"E"),NP(a,"name","aa") -> a=b, c=da, e="S",f="100";
+egds;
+disconnect;

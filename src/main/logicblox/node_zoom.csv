@@ -1,0 +1,16 @@
+align_warp_1,ALIGN_WARP
+anatomy_image_1,ANATOMY_IMAGE
+anatomy_header_1,ANATOMY_HEADER
+reference_image_9,REFERENCE_IMAGE
+reference_header_10,REFERENCE_HEADER
+warp_params_1,WARP_PARAMS
+reslice_5,RESLICE
+resliced_image_1,RESLICED_IMAGE
+resliced_header_1,RESLICED_HEADER
+softmean_9,SOFTMEAN
+alias_image_23,ALIAS_IMAGE
+alias_header_24,ALIAS_HEADER
+slicer_10,SLICER
+alias_X_slice_25,ALIAS_SLICE
+convert_13,CONVERT
+alias_X_graphic_28,ALIAS_GRAPHIC

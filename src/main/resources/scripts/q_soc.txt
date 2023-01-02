@@ -1,0 +1,108 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+# init;
+# prepare from "data";
+connect pg;
+drop TEST1;
+create graph TEST1;
+use TEST1;
+
+# schema;
+create node U;
+create edge F (U -> U);
+create edge F2 (U -> U);
+create edge T (U -> U);
+
+# data
+insert N (1,"U");
+insert N (2,"U");
+insert N (3,"U");
+insert N (4,"U");
+insert N (5,"U");
+insert N (6,"U");
+insert N (7,"U");
+insert N (8,"U");
+insert N (9,"U");
+insert N (10,"U");
+insert N (12,"U");
+insert N (13,"U");
+insert N (14,"U");
+insert N (15,"U");
+
+insert E (101,1,2,"F");
+insert E (102,2,3,"F");
+insert E (103,3,4,"F");
+insert E (104,3,5,"F");
+insert E (105,5,6,"F");
+insert E (106,6,7,"F");
+insert E (106,7,8,"F");
+insert E (106,8,9,"F");
+insert E (106,9,10,"F");
+insert E (106,10,11,"F");
+insert E (106,11,12,"F");
+insert E (106,12,13,"F");
+insert E (106,13,14,"F");
+insert E (106,14,15,"F");
+
+# constraints (EGDs);
+#add constraint N(b,"B"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+#add constraint N(b,"B1"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C1"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+
+# import data from CSV;
+#import N from "/Users/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/node.csv";
+#import E from "/Users/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/edge.csv";
+import N from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/node.csv";
+import E from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/soc/edge.csv";
+
+# views; 
+# virtual
+# hybrid
+# materialized
+# asr
+
+#	match v1:W-e1:WS->v2:S, v2-e2:SL->v3:L add v4:NEWNODE
+create asr view v0 as {
+#	match v1:U-e1:F->v2:U, v2-e2:F->v3:U where v1 > 1000, v1 < 2000 add v1-ne1:F2->v3
+#}, {
+#	match v1:U-e1:F->v2:U, v2-e2:F->v3:U, v3-e3:F->v4:U, v4-e4:F->v5:U, v5-e5:F->v6:U, v6-e6:F->v7:U, v7-e7:F->v8:U, v8-e8:F->v9:U
+	match v1:U-e1:F->v2:U, v2-e2:F->v3:U, v3-e3:F->v4:U
+	where v1 > 10, v1 < 20
+	add v1-ne1:T->v3
+#	where v1 > 10, v1 < 100 
+#	match v1:U-e1:F->v2:U, v2-e2:F->v3:U, v3-e3:F->v4:U, v4-e4:F->v5:U add v1-ne1:F9->v5
+};
+
+# MV: 35285	2187
+# VV: 0		49768
+
+
+# MV: 16853 + 1487
+# VV: 0 + 56523
+# SSR: 44570 + 55
+
+# a<10
+
+ 
+
+#create ssr on v0;
+
+#match v1:U-e1:F9->v2:U from v0 where v1 < 1000 return v1-e1->v2;
+
+#match v1:U-e1:F2->v2:U from v0 return v1-e1->v2;
+match v1:U-e1:T->v2:U from v0 
+#where v1 >10, v1 < 100 
+return v1-e1->v2;
+
+#match n1:W-e3:NN->n3:L from v0 where n1 > 100, n1 < 200 return n1-e3->n3;
+#match n1:W-e3:NN->n3:L from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 100, n1 < 200 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:NEWNODE from v0 where n1 < 100 return n1;
+#match n1:NEWNODE from v0 where n1 > 1000, n1 < 1200 return n1;
+
+program;
+disconnect;

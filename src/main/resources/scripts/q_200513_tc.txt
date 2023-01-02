@@ -1,0 +1,98 @@
+connect 127.0.0.1 5518;
+create graph t;
+use t;
+
+# graph schema
+create node A;
+create node B;
+create node C;
+create node D;
+create node E;
+create node S;
+create node T;
+
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (B -> D);
+create edge X (A -> E);
+create edge X (E -> B);
+
+create edge X (B -> S);
+create edge X (T -> E);
+
+#insert N (1,"A");
+#insert N (2,"B");
+#insert N (3,"C");
+#insert N (4,"D");
+#insert E (101,1,2,"X");
+#insert E (102,2,3,"X");
+#insert E (103,2,4,"X");
+
+#insert N (11,"A");
+#insert N (12,"E");
+#insert N (13,"B");
+#insert E (111,11,12,"X");
+#insert E (111,12,13,"X");
+
+import N from "/home/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+import E from "/home/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+#import N from "/Users/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+#import E from "/Users/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+# graph constraints
+add constraint N(a,"A"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+add constraint N(a,"B"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+
+
+insert N (1000000,"A");
+insert N (1000001,"A");
+insert N (1000002,"A");
+
+
+#create view v1qv as #
+#	{match a:A-x1:X->b:B, b-x2:X->c:C, b-x3:X->d:D map (c,d) to x:S},
+#	{match a:A-x1:X->b:B, b-x2:X->c:C, b-x3:X->d:D map (c,d) to x:S}
+#;
+
+#create view v0v as 
+#	{match a:A-x1:X->b:B, b-x2:X->c:C, b-x3:X->d:D map (c,d) to x:S}
+#;
+#create view v1v on v0v as
+#	{match s:A-x1:X->t:E, t-x2:X->u:B map (s,t) to y:T}
+#;
+
+## parallel
+create materialized view v1v as
+	{match a:A-x1:X->b:B, b-x2:X->c:C, b-x3:X->d:D map (c,d) to x:S},
+	{match s:A-x1:X->t:E, t-x2:X->u:B map (s,t) to y:T}
+;
+
+## sequential
+#create materialized view v0v as
+#	{match a:A-x1:X->b:B, b-x2:X->c:C, b-x3:X->d:D map (c,d) to x:S}
+#;
+#create materialized view v1v on v0v as
+#	{match s:A-x1:X->t:E, t-x2:X->u:B map (s,t) to y:T}
+#;
+
+
+
+insert N (1000010,"A");
+match a:A-r:X->b:B from v1 return a-r->b;
+insert N (1000011,"A");
+match a:A-r:X->b:B from v1 return a-r->b;
+insert N (1000012,"A");
+match a:A-r:X->b:B from v1 return a-r->b;
+
+
+program;
+#query;
+#match a:A-r:X->b:B, b-r2:X->s:S from v1 return a-r->b;
+##match a:A-r:X->b:B from v1 return a-r->b;
+#match a:S from v1 return a;
+
+
+#schema;
+#drop graph t;
+

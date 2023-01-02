@@ -1,0 +1,58 @@
+raw_node(id,type) -> string(id), string(type).
+raw_edge(id1,id2,type) -> string(id1), string(id2), string(type).
+
+// node(level,id,type) -> int(level), string(id), string(type).
+// edge(level,id1,id2,type) -> int(level), string(id1), string(id2), string(type).
+
+// meta_node(level,meta,type,member) -> int(level), string(meta),string(type),string(member).
+
+// delta_node(level,id,type,add) -> int(level), string(id), string(type), boolean(add).
+// delta_edge(level,id1,id2,type,add) -> int(level), string(id1), string(id2), string(type), boolean(add).
+
+
+node0(id,type) -> string(id), string(type).
+edge0(id1,id2,type) -> string(id1), string(id2), string(type).
+
+meta_node0(meta,type,member) -> string(meta),string(type),string(member).
+
+delta_node0(id,type,add) -> string(id), string(type), boolean(add).
+delta_edge0(id1,id2,type,add) -> string(id1), string(id2), string(type), boolean(add).
+
+node1(id,type) -> string(id), string(type).
+edge1(id1,id2,type) -> string(id1), string(id2), string(type).
+
+meta_node1(meta,type,member) -> string(meta),string(type),string(member).
+
+delta_node1(id,type,add) -> string(id), string(type), boolean(add).
+delta_edge1(id1,id2,type,add) -> string(id1), string(id2), string(type), boolean(add).
+
+node2(id,type) -> string(id), string(type).
+edge2(id1,id2,type) -> string(id1), string(id2), string(type).
+
+meta_node2(meta,type,member) -> string(meta),string(type),string(member).
+
+delta_node2(id,type,add) -> string(id), string(type), boolean(add).
+delta_edge2(id1,id2,type,add) -> string(id1), string(id2), string(type), boolean(add).
+
+path(level, id1, id2) -> int(level), string(id1), string(id2).
+//lang:derivationType[`path] = "Derived".
+
+
+//path(level, id1, id2) -> int(level), string(id1), string(id2).
+// node0(id,name,type,ts) -> int(id), string(name), string(type), int(ts).
+// edge0(id1,id2,type) -> int(id1), int(id2), string(type).
+
+// node1(id,name,type,ts) -> int(id), string(name), string(type), int(ts).
+// edge1(id1,id2,type) -> int(id1), int(id2), string(type).
+
+
+/*
+path_asr(l,v1,v2) -> int(l), int(v1), int(v2).
+lang:derivationType[`path_asr] = "DerivedAndStored".
+
+path_with_asr(l,m,v1,v2) -> int(l), int(m), int(v1), int(v2).
+lang:derivationType[`path_with_asr] = "Derived".
+
+path_asr_count[n] = c
+	<- agg<< c = count() >> path_asr(n,_,_).
+*/

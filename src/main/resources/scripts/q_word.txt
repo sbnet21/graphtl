@@ -1,0 +1,74 @@
+# options;
+option typecheck off;
+option prunetypecheck on;
+option prunequery off;
+# init;
+# prepare from "data";
+connect lb;
+drop TEST1;
+create graph TEST1;
+use TEST1;
+
+# schema;
+create node W;
+create node S;
+create node L;
+create node NEWNODE;
+create edge WS (W -> S);
+create edge SL (S -> L);
+create edge A (L -> L);
+create edge NN (W -> L);
+create edge AW (W -> W);
+
+# data
+insert N (1,"W");
+insert N (2,"S");
+insert N (3,"L");
+insert N (11,"W");
+insert N (12,"S");
+insert N (13,"L");
+insert E (101,1,2,"WS");
+insert E (102,2,3,"SL");
+insert E (103,11,12,"WS");
+insert E (104,12,13,"SL");
+insert E (105,3,13,"A");
+insert E (106,13,3,"A");
+
+# constraints (EGDs);
+#add constraint N(b,"B"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+#add constraint N(b,"B1"),N(c1,l1),N(c2,l2),E(e1,b,c1,l3),E(e2,b,c2,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+#add constraint N(c,"C1"),N(b1,l1),N(b2,l2),E(e1,b1,c,l3),E(e2,b2,c,l4) -> b1=b2, l1=l2, e1=e2, l3=l4;
+
+# import data from CSV;
+#import N from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/word/node.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/experiment/dataset/targets/word/edge.csv";
+
+# views; 
+# virtual
+# hybrid
+# materialized
+# asr
+
+#	match v1:W-e1:WS->v2:S, v2-e2:SL->v3:L add v4:NEWNODE
+create virtual view v0 as {
+	match n1:W-e1:WS->n2:S, n2-e2:SL->n3:L 
+	add n1-e3:NN->n3
+}, {
+	match n1:W-e1:WS->n2:S, n2-e2:SL->n3:L, n5:W-e3:WS->n6:S, n6-e5:SL->n7:L, n3-e6:A->n7 
+	add n1-e7:AL->n5, n1-e8:AL2->n5
+};
+
+#program;
+
+
+create ssr on v0;
+
+match n1:W-e3:NN->n3:L from v0 return n1-e3->n3;
+#match n1:W-e3:NN->n3:L from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 100, n1 < 200 return n1-e3->n3;
+#match n1:W-e3:AL->n3:W from v0 where n1 > 1000, n1 < 2100 return n1-e3->n3;
+#match n1:NEWNODE from v0 where n1 < 100 return n1;
+#match n1:NEWNODE from v0 where n1 > 1000, n1 < 1200 return n1;
+
+disconnect;

@@ -1,0 +1,17 @@
+align_warp_1,anatomy_image_1,USED
+align_warp_1,anatomy_header_1,USED
+align_warp_1,reference_image_9,USED
+align_warp_1,reference_header_10,USED
+warp_params_1,align_warp_1,WAS_GENERATED_BY
+reslice_5,warp_params_1,USED
+resliced_image_1,reslice_5,WAS_GENERATED_BY
+resliced_header_1,reslice_5,WAS_GENERATED_BY
+softmean_9,resliced_image_1,USED
+softmean_9,resliced_header_1,USED
+alias_image_23,softmean_9,WAS_GENERATED_BY
+alias_header_24,softmean_9,WAS_GENERATED_BY
+slicer_10,alias_image_23,USED
+slicer_10,alias_header_24,USED
+alias_X_slice_25,slicer_10,WAS_GENERATED_BY
+convert_13,alias_X_slice_25,USED
+alias_X_graphic_28,convert_13,WAS_GENERATED_BY

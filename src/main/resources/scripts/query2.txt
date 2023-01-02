@@ -1,0 +1,63 @@
+connect 127.0.0.1 5518;
+create graph Friday;
+use Friday;
+create node A;
+create node B;
+create node C;
+create node D;
+create node E1;
+create node F;
+create node G;
+create node X;
+create node Y;
+create edge X1 (A -> B);
+create edge X2 (B -> C);
+create edge X3 (A -> D);
+create edge X4 (D -> E1);
+create edge X5 (A -> F);
+create edge X6 (F -> G);
+
+add constraint N(n1,"A"),N(n2,l1),N(n3,l2),E(e1,n1,n2,l3),E(e2,n1,n3,l4) -> l1=l2;
+add constraint N(na1,"A"),N(na2,l1),N(na3,l2),E(ea1,na1,na2,l3),E(ea2,na1,na3,l4) -> l1=l2;
+
+import NP from "/Users/sbnet21/Src/workspace/graph-trans/data/np.csv";
+
+insert N (1,"A");
+insert N (2,"B");
+insert N (3,"C");
+insert N (11,"A");
+insert N (12,"D");
+insert N (13,"E1");
+insert N (14,"F");
+insert N (15,"G");
+insert N (11,"A1");
+insert N (12,"B1");
+insert N (13,"C1");
+insert N (111,"A1");
+insert N (112,"D1");
+insert N (113,"E11");
+insert N (114,"F1");
+insert N (115,"G1");
+
+insert E (100,1,2,"X1");
+insert E (101,2,3,"X2");
+insert E (102,11,12,"X3");
+insert E (103,12,13,"X4");
+insert E (104,11,14,"X5");
+insert E (105,14,15,"X6");
+
+insert E (1100,11,12,"X11");
+insert E (1101,12,13,"X12");
+insert E (1102,111,112,"X13");
+insert E (1103,112,113,"X14");
+insert E (1104,111,114,"X15");
+insert E (1105,114,115,"X16");
+
+create view tview as 
+{ match a:A-x:X1->b:B, b-y:X2->c:C map (a,b) to x:M1 remove c:C},
+{ match a:A-e1:X3->d:D, d-e2:X4->e:E1, a-e3:X5->f:F, f-e4:X6->g:G map (d,e) to y:M2 add a:A-e5:X7->g:G remove f-e4:X6->g:G},
+{ match a:A1-x:X11->b:B1, b-y:X12->c:C1 map (a,b) to x:M11 remove c:C1},
+{ match a:A1-e1:X13->d:D1, d-e2:X14->e:E11, a-e3:X15->f:F1, f-e4:X16->g:G1 map (d,e) to y:M12 add a:A-e5:X17->g:G11 remove f-e4:X16->g:G1}
+;
+
+disconnect;

@@ -1,0 +1,54 @@
+connect 127.0.0.1 5518;
+create graph t;
+use t;
+
+create node A;
+create node B;
+create node C;
+create node D;
+create node E;
+create node S;
+create node T;
+
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (B -> D);
+create edge X (A -> E);
+create edge X (E -> B);
+
+create edge X (B -> S);
+create edge X (T -> E);
+
+insert N (1,"A");
+insert N (2,"A");
+insert N (3,"A");
+insert N (4,"B");
+insert N (5,"C");
+insert E (101,1,4,"X");
+insert E (102,2,4,"X");
+insert E (103,3,4,"X");
+insert E (104,4,5,"X");
+
+#import N from "/home/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+#import N from "/Users/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+#import E from "/Users/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+#add constraint N(a,"A"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+#add constraint N(a,"B"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+
+create virtual view v1 as 
+	{match {a:A}-x1:X->b:B map (a) to x:S}
+;
+
+program;
+
+#match x:S-x1:X->b:B from v1 return x-x1->b;
+match x:S-x1:X->b:B from v1 return x;
+
+
+#schema;
+#drop graph t;
+
+

@@ -1,0 +1,51 @@
+# options
+option typecheck on;
+option prunetypecheck on;
+option prunequery off;
+# init
+connect pg;
+drop syn;
+create graph syn;
+use syn;
+# schema
+create node A;
+create node B;
+create node C;
+create node D;
+create node D;
+create node F;
+create node H;
+create node S;
+create node T;
+create edge X (A -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge Y (C -> D);
+create edge X (D -> F);
+create edge X (F -> H);
+# 3 copies
+# constraints (EGDs)
+add constraint N(c,"C"),N(d1,l1),N(d2,l2),E(e1,c,d1,l3),E(e2,c,d2,l4) -> d1=d2, l1=l2, e1=e2, l3=l4;
+add constraint N(d,"D"),N(c1,l1),N(c2,l2),E(e1,c1,d,l3),E(e2,c1,d,l4) -> c1=c2, l1=l2, e1=e2, l3=l4;
+# 3 copies
+import N from "data/SYN_n.csv";
+import E from "data/SYN_e.csv";
+
+# views
+create hybrid view v0 as {
+#	match b:B-e1:X->c:C, c:C-e2:X->d:D, d-e0:X->c2:C, c2-e4:Y->d2:D 
+	match c:C-e2:X->d:D
+	map (c,d) to s:S
+#	add t:T, s-e3:Y->t
+#	remove b, c2-e4:Y->d2
+	};
+
+#match s:S from v0 return s;
+match s:S-e:X->c:C from v0 where s.id = 100000233 return s-e->c;
+#match s:S-e:X->c:C from v0 return s-e->c;
+
+#create materialized view v0 as {match c:C-e2:X->d:D map (c,d) to s:S}, {match c:C-e2:Y->d:D map (c,d) to t:T};
+
+#drop syn;
+disconnect;
+quit;

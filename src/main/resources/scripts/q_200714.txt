@@ -1,0 +1,69 @@
+connect 127.0.0.1 5518;
+create graph t;
+use t;
+
+create node A;
+create node B;
+create node C;
+create node D;
+create node E;
+create node S;
+create node T;
+create node F;
+
+create edge X (A -> B);
+create edge X (B -> B);
+create edge X (B -> C);
+create edge X (C -> D);
+create edge X (D -> D);
+create edge X (C -> E);
+create edge X (E -> F);
+
+create edge X (A -> S);
+create edge X (S -> C);
+create edge X (C -> T);
+
+#insert N (1,"A");
+#insert N (2,"B");
+#insert N (3,"B");
+#insert N (4,"C");
+#insert N (5,"D");
+#insert N (6,"D");
+#insert N (7,"E");
+#insert N (8,"F");
+
+#insert E (101,1,2,"X");
+#insert E (102,2,3,"X");
+#insert E (103,3,4,"X");
+#insert E (104,4,5,"X");
+#insert E (105,5,6,"X");
+#insert E (106,4,7,"X");
+#insert E (107,7,8,"X");
+
+
+
+#import N from "/home/sbnet21/src/workspace/graph-trans/data/gen_n.csv";
+#import E from "/home/sbnet21/src/workspace/graph-trans/data/gen_e.csv";
+
+import N from "/Users/sbnet21/src/workspace/graph-trans/nq.csv";
+import E from "/Users/sbnet21/src/workspace/graph-trans/eq.csv";
+
+#add constraint N(a,"A"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+#add constraint N(a,"B"),N(b1,l1),N(b2,l2),E(e1,a,b1,"X"),E(e2,a,b2,"X") -> l1=l2, e1=e2;
+
+create materialized view v1 as 
+	{match a:A-e1:X->b1:B, b1-e2:X->b2:B, b2-e3:X->c:C map (b1,b2) to b:S}, 
+	{match c:C-e1:X->d1:D, d1:D-e2:X->d2:D, c:C-e3:X->e:E map (d1,d2) to d:T}
+;
+
+create index on v1;
+
+program;
+
+#match x:S-x1:X->b:B from v1 return x-x1->b;
+#match x:S-x1:X->b:B from v1 return x;
+#match x:S from v1 return x;
+
+
+#schema;
+#drop graph t;
